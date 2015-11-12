@@ -33,7 +33,9 @@ Bio::EnsEMBL::DBSQL::TaxonomyNodeAdaptor
 
 =head1 SYNOPSIS
 
-#create an adaptor (Registry cannot be used currently)
+# use the registry
+my $tax_dba = Bio::EnsEMBL::Registry->get_DBAdaptor("multi","taxonomy");
+# or create directly
 my $tax_dba =  Bio::EnsEMBL::DBSQL::TaxonomyDBAdaptor->new(
 									  -user   => $tax_user,
 									  -pass   => $tax_pass,
@@ -53,13 +55,15 @@ for my $node (@lineage) {
 
 =head1 DESCRIPTION
 
-A database adaptor allowing access to the nodes of the NCBI taxonomy. It is currently managed independently of the registry:
+A database adaptor allowing access to the nodes of the NCBI taxonomy. It can be instantiated directly:
 my $tax_dba =  Bio::EnsEMBL::DBSQL::TaxonomyDBAdaptor->new(
 									  -user   => $tax_user,
 									  -pass   => $tax_pass,
 									  -dbname => $tax_db,
 									  -host   => $tax_host,
 									  -port   => $tax_port);
+or retrieved from the Registry if present on the server:
+my $tax_dba = Bio::EnsEMBL::Registry->get_DBAdaptor("multi","taxonomy");
 									  									  
 my $node_adaptor = $tax_dba->get_TaxonomyNodeAdaptor();
 # or alternatively

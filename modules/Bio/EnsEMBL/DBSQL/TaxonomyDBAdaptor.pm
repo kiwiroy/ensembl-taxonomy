@@ -37,7 +37,7 @@ Specialised DBAdaptor for connecting to the ncbi_taxonomy MySQL database
 
 =head1 SYNOPSIS
 
-#create an adaptor (Registry cannot be used currently)
+#create an adaptor
 my $tax_dba =  Bio::EnsEMBL::DBSQL::TaxonomyDBAdaptor->new(
 									  -user   => $tax_user,
 									  -pass   => $tax_pass,
@@ -45,6 +45,9 @@ my $tax_dba =  Bio::EnsEMBL::DBSQL::TaxonomyDBAdaptor->new(
 									  -host   => $tax_host,
 									  -port   => $tax_port);	
 my $node_adaptor = $tax_dba->get_TaxonomyNodeAdaptor();
+
+# use the registry
+my $tax_dba = Bio::EnsEMBL::Registry->get_DBAdaptor("multi","taxonomy");
 									  
 =head DESCRIPTION
 

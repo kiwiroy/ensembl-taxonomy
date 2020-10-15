@@ -3,6 +3,9 @@ language: "perl"
 services:
   - mysql
 
+os: linux
+dist: xenial
+
 perl:
   - "5.26"
   - "5.14"
@@ -10,34 +13,21 @@ perl:
 env:
   - COVERALLS=true  DB=mysql
   
-sudo: false
-  
 addons:
   apt:
     packages:
     - unzip
 
-before_install:
-    - git clone --branch master --depth 1 https://github.com/Ensembl/ensembl.git
-    - git clone --branch master --depth 1 https://github.com/Ensembl/ensembl-test.git
-    - git clone --branch version/2.3 --depth 1 https://github.com/Ensembl/ensembl-hive.git
-    - wget https://github.com/bioperl/bioperl-live/archive/release-1-6-924.zip
-    - unzip release-1-6-924.zip
-
-
 install:
-    - cpanm --sudo -n Devel::Cover::Report::Coveralls
-    - cpanm --sudo -n DBD::SQLite
-    - cpanm --sudo -n JSON
+    - cpanm -n -q Devel::Cover::Report::Coveralls DBD::SQLite JSON Proc::Daemon
     - cp travisci/MultiTestDB.conf.travisci.mysql  modules/t/MultiTestDB.conf.mysql
     - cp travisci/MultiTestDB.conf.travisci.SQLite modules/t/MultiTestDB.conf.SQLite
-    - cd ensembl && cpanm --sudo --installdeps .
-    - cd -
+    - cpanm -n -q --installdeps --cpanfile=ensembl/cpanfile .
 
 script: "./travisci/harness.sh"
 
 # Get the matrix to only build coveralls support when on 5.10
-matrix:
+jobs:
   exclude:
     - perl: "5.14"
       env: COVERALLS=false DB=mysql

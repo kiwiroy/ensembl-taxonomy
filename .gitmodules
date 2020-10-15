@@ -1,0 +1,15 @@
+[submodule "ensembl"]
+	path = ensembl
+	url = https://github.com/Ensembl/ensembl.git
+	branch = master
+[submodule "ensembl-test"]
+	path = ensembl-test
+	url = https://github.com/Ensembl/ensembl-test.git
+	branch = master
+[submodule "ensembl-hive"]
+	path = ensembl-hive
+	url = https://github.com/Ensembl/ensembl-hive.git
+	branch = master
+[submodule "bioperl-live"]
+	path = bioperl-live
+	url = https://github.com/bioperl/bioperl-live.git

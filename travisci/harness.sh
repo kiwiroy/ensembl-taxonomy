@@ -1,7 +1,7 @@
 #!/bin/bash
 
 export PERL5LIB=$PWD/bioperl-live-bioperl-release-1-2-3:$PWD/ensembl-test/modules:$PWD/ensembl/modules:$PWD/ensembl-hive/modules:$PWD/modules
-
+export EHIVE_ROOT_DIR=$PWD/ensembl-hive
 SKIP_TESTS="--skip 55-build_pruned_tree_big.t"
 if [ "$DB" = 'mysql' ]; then
     (cd modules/t && ln -sf MultiTestDB.conf.mysql MultiTestDB.conf)

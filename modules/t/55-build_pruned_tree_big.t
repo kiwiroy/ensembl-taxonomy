@@ -23,6 +23,8 @@ use Bio::EnsEMBL::Taxonomy::DBSQL::TaxonomyNodeAdaptor;
 use FindBin qw($Bin);
 my $conf_file = "$Bin/db.conf";
 
+plan skip_all => "--skip 55-build_pruned_tree_big for continuous integration" if $ENV{CI};
+
 my $conf = do $conf_file
   || die "Could not load configuration from " . $conf_file;
 

@@ -19,6 +19,9 @@ use Test::More;
 use Bio::EnsEMBL::Taxonomy::TaxonomyNode;
 use Bio::EnsEMBL::Taxonomy::DBSQL::TaxonomyDBAdaptor;
 use Bio::EnsEMBL::Taxonomy::DBSQL::TaxonomyNodeAdaptor;
+use Bio::EnsEMBL::Test::MultiTestDB;
+my $multi = Bio::EnsEMBL::Test::MultiTestDB->new('multi');
+my $tax   = $multi->get_DBAdaptor('taxonomy');
 
 use FindBin qw($Bin);
 my $conf_file = "$Bin/db.conf";
@@ -35,7 +38,7 @@ my $dba =  Bio::EnsEMBL::DBSQL::DBAdaptor->new(
 									  -port   => $conf->{port},
 									  -driver => $conf->{driver});
 									  
-my $node_adaptor = Bio::EnsEMBL::Taxonomy::DBSQL::TaxonomyNodeAdaptor->new($dba);
+my $node_adaptor = Bio::EnsEMBL::Taxonomy::DBSQL::TaxonomyNodeAdaptor->new($tax);
 		
 ok( defined $node_adaptor, 'Checking if the node adaptor is defined' );
 
@@ -47,6 +50,7 @@ is ($n1->taxon_id(),10,'Checking node ID is as expected');
 diag($n1->to_string());
 
 my $an1 = $node_adaptor->fetch_ancestor_by_rank($n1,"species");
+ok $an1, "ancestor by rank fetched successfully";
 diag("Species ancestor: ".$an1->to_string());
 
 my $n2 = $node_adaptor->fetch_by_taxon_id( 11 )

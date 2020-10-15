@@ -19,7 +19,9 @@ use Test::More;
 use Bio::EnsEMBL::Taxonomy::TaxonomyNode;
 use Bio::EnsEMBL::Taxonomy::DBSQL::TaxonomyDBAdaptor;
 use Bio::EnsEMBL::Taxonomy::DBSQL::TaxonomyNodeAdaptor;
-
+use Bio::EnsEMBL::Test::MultiTestDB;
+my $multi = Bio::EnsEMBL::Test::MultiTestDB->new('multi');
+my $tax   = $multi->get_DBAdaptor('taxonomy');
 use FindBin qw($Bin);
 my $conf_file = "$Bin/db.conf";
 
@@ -35,7 +37,7 @@ my $dba =  Bio::EnsEMBL::DBSQL::DBAdaptor->new(
 									  -port   => $conf->{port},
 									  -driver => $conf->{driver});
 									  
-my $node_adaptor = Bio::EnsEMBL::Taxonomy::DBSQL::TaxonomyNodeAdaptor->new($dba);
+my $node_adaptor = Bio::EnsEMBL::Taxonomy::DBSQL::TaxonomyNodeAdaptor->new($tax);
 		
 ok( defined $node_adaptor, 'Checking if the node adaptor is defined' );
 
@@ -54,6 +56,6 @@ is ($n2->taxon_id(),8,'Checking node ID is as expected');
 diag($n2->to_string());
 
 ok($n1->has_ancestor($n2)==1,"Checking that ".$n1->to_string()." has ancestor ".$n2->to_string());
-ok($n2->has_ancestor($n1)==0),"Checking that ".$n2->to_string()." does not have ancestor ".$n1->to_string();
+ok($n2->has_ancestor($n1)==0,"Checking that ".$n2->to_string()." does not have ancestor ".$n1->to_string());
 
 done_testing;

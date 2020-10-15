@@ -20,6 +20,9 @@ use Test::More;
 use Bio::EnsEMBL::Taxonomy::TaxonomyNode;
 use Bio::EnsEMBL::Taxonomy::DBSQL::TaxonomyDBAdaptor;
 use Bio::EnsEMBL::Taxonomy::DBSQL::TaxonomyNodeAdaptor;
+use Bio::EnsEMBL::Test::MultiTestDB;
+my $multi = Bio::EnsEMBL::Test::MultiTestDB->new('multi');
+my $tax   = $multi->get_DBAdaptor('taxonomy');
 
 use FindBin qw($Bin);
 my $conf_file = "$Bin/db.conf";
@@ -37,7 +40,7 @@ my $dba =  Bio::EnsEMBL::DBSQL::DBAdaptor->new(
 									  -port   => $conf->{port},
 									  -driver => $conf->{driver});
 									  
-my $node_adaptor = Bio::EnsEMBL::Taxonomy::DBSQL::TaxonomyNodeAdaptor->new($dba);
+my $node_adaptor = Bio::EnsEMBL::Taxonomy::DBSQL::TaxonomyNodeAdaptor->new($tax);
 		
 ok( defined $node_adaptor, 'Checking if the node adaptor is defined' );
 

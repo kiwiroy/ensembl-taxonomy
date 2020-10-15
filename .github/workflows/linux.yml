@@ -1,0 +1,65 @@
+name: linux
+on:
+  push:
+    branches:
+      - '*'
+    tags-ignore:
+      - '*'
+  pull_request:
+jobs:
+  perl:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: randomised
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+    strategy:
+      matrix:
+        perl-version:
+          - '5.30'
+        database:
+          - sqlite
+          - mysql
+    container:
+      image: perl:${{ matrix.perl-version }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - name: perl -V
+        run: perl -V
+      - name: Install dependencies
+        run: |
+          apt-get update -y && apt-get install -y mariadb-client sqlite3
+          cpanm -n -q --installdeps .
+          cpanm -n -q --cpanfile=ensembl/cpanfile --installdeps .
+      - name: Copy/Link Configuration
+        run: |
+            cp travisci/MultiTestDB.conf.travisci.mysql  modules/t/MultiTestDB.conf.mysql
+            cp travisci/MultiTestDB.conf.travisci.SQLite modules/t/MultiTestDB.conf.sqlite
+            (cd modules/t && ln -sf MultiTestDB.conf.${DB} MultiTestDB.conf)
+        env:
+            DB: ${{matrix.database}}
+      - name: SQLite compatible table.sql
+        run: |
+            curl -Lo mysql2sqlite https://raw.githubusercontent.com/dumblob/mysql2sqlite/master/mysql2sqlite
+            chmod 755 mysql2sqlite
+            ./mysql2sqlite modules/t/test-genome-DBs/multi/taxonomy/ncbi_taxa_name.sql > modules/t/test-genome-DBs/multi/taxonomy/ncbi_taxa_name.sqlite && \
+                mv modules/t/test-genome-DBs/multi/taxonomy/ncbi_taxa_name.sqlite modules/t/test-genome-DBs/multi/taxonomy/ncbi_taxa_name.sql
+            ./mysql2sqlite modules/t/test-genome-DBs/multi/taxonomy/ncbi_taxa_node.sql > modules/t/test-genome-DBs/multi/taxonomy/ncbi_taxa_node.sqlite && \
+                mv modules/t/test-genome-DBs/multi/taxonomy/ncbi_taxa_node.sqlite modules/t/test-genome-DBs/multi/taxonomy/ncbi_taxa_node.sql
+        if: matrix.database == 'sqlite'
+      - name: MySQL user
+        run: |
+            mysql -h mysql -u root -prandomised -e "SHOW DATABASES"
+            mysql -h mysql -u root -prandomised -e "CREATE USER 'travis'; GRANT ALL PRIVILEGES ON *.* TO 'travis'@'%';"
+        if: matrix.database == 'mysql'
+      - name: Run tests
+        run: prove -v
+        env:
+            DB: ${{matrix.database}}
+            DBHOST: ${{matrix.database}}
+            ENSEMBL_TESTDB_PREFIX: gha
+            EHIVE_ROOT_DIR: ${{github.workspace}}/ensembl-hive

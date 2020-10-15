@@ -1,0 +1,6 @@
+-Ibioperl-live
+-Iensembl/modules
+-Iensembl-test/modules
+-Iensembl-hive/modules
+-Imodules
+modules/t
